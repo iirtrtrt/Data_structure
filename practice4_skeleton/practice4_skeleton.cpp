@@ -26,6 +26,7 @@ public:
   int key;
   TreeNode *left;
   TreeNode *right;
+
   TreeNode(int k, TreeNode *l = nullptr, TreeNode *r = nullptr)
   {
     key = k;

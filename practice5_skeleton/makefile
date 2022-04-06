@@ -9,3 +9,5 @@ run: practice5
 
 clean: practice5
 	rm practice5
+	rm output7.txt
+	rm output8.txt

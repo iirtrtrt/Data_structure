@@ -46,12 +46,12 @@ public:
   bool isEmpty() { return (root == nullptr); }
   TreeNode *findMin();
   TreeNode *findMax();
-  TreeNode *search(int, TreeNode *);
+  TreeNode *search(int);
   void insertNode(int, TreeNode *);
   void deleteNode(int, TreeNode *);
   void writeInorder(ofstream &, TreeNode *);
-  void writePreorder(ofstream &, TreeNode *);
-  void writePostorder(ofstream &, TreeNode *);
+  void writePreorder(ofstream &);
+  void writePostorder(ofstream &);
   void printTree();
 
 private:
@@ -141,21 +141,9 @@ TreeNode *BinarySearchTree::findMax()
 // Given a query, search for the node whose key is equal to query.
 // If the node exists, return the key
 // Otherwise, return nullptr
-TreeNode *BinarySearchTree::search(int query, TreeNode *ptr)
+TreeNode *BinarySearchTree::search(int query)
 {
   // Practice 5
-  if (ptr->key == query or ptr == nullptr)
-  {
-    return ptr;
-  }
-  else if (query < ptr->key and ptr->left)
-  {
-    return search(query, ptr->left);
-  }
-  else if (query > ptr->key and ptr->right)
-  {
-    return search(query, ptr->right);
-  }
   return 0;
 }
 
@@ -169,21 +157,31 @@ void BinarySearchTree::insertNode(int k, TreeNode *ptr)
     root = new TreeNode(k);
     return;
   }
-  if (ptr != nullptr and ptr->key == k)
+
+  if (ptr->key == k)
   {
     return;
   }
-  else
+  else if (ptr->key > k)
   {
-    if (ptr == nullptr)
+    if (ptr->left == nullptr)
     {
-      ptr = new TreeNode(k);
+      ptr->left = new TreeNode(k);
+      return;
     }
-    if (ptr->key > k)
+    else
     {
       return insertNode(k, ptr->left);
     }
-    else if (ptr->key < k)
+  }
+  else if (ptr->key < k)
+  {
+    if (ptr->right == nullptr)
+    {
+      ptr->right = new TreeNode(k);
+      return;
+    }
+    else
     {
       return insertNode(k, ptr->right);
     }
@@ -207,36 +205,22 @@ void BinarySearchTree::writeInorder(ofstream &outFile, TreeNode *ptr)
     return;
   }
   writeInorder(outFile, ptr->left);
-  cout << ptr->key << endl;
+  outFile << ptr->key << " ";
   writeInorder(outFile, ptr->right);
 }
 
 // Given an output file stream, write the keys of all the nodes
 // visited in preorder traversal
-void BinarySearchTree::writePreorder(ofstream &outFile, TreeNode *ptr)
+void BinarySearchTree::writePreorder(ofstream &outFile)
 {
   // Practice 5
-  if (ptr == nullptr)
-  {
-    return;
-  }
-  outFile << ptr->key << " ";
-  writePreorder(outFile, ptr->left);
-  writePreorder(outFile, ptr->right);
 }
 
 // Given an output file stream, write the keys of all the nodes
 // visited in postorder traversal
-void BinarySearchTree::writePostorder(ofstream &outFile, TreeNode *ptr)
+void BinarySearchTree::writePostorder(ofstream &outFile)
 {
   // Practice 5
-  if (ptr == nullptr)
-  {
-    return;
-  }
-  writePostorder(outFile, ptr->left);
-  writePostorder(outFile, ptr->right);
-  outFile << ptr->key << " ";
 }
 
 int BinarySearchTree::_getHeight(TreeNode *curr)
@@ -371,22 +355,12 @@ int main(int argc, char *argv[])
       }
       outFile << endl;
       break;
-    // case PREORDER:
-    //   // Practice 5. Call the function for preorder traversal;
-    //   if (tree.root != nullptr)
-    //   {
-    //     tree.writePreorder(outFile, tree.root);
-    //   }
-    //   outFile << endl;
-    //   break;
-    // case POSTORDER:
-    //   // Practice 5. Call the function for postorder traversal;
-    //   if (tree.root != nullptr)
-    //   {
-    //     tree.writePostorder(outFile, tree.root);
-    //   }
-    //   outFile << endl;
-    //   break;
+    case PREORDER:
+      // Practice 5. Call the function for preorder traversal;
+      break;
+    case POSTORDER:
+      // Practice 5. Call the function for postorder traversal;
+      break;
     case INSERT:
       if (!(iss >> k))
       {
@@ -394,15 +368,8 @@ int main(int argc, char *argv[])
         exit(1);
       }
       // TODO. Practice 6. Call the function for insertion
-      if (k)
-      {
-        tree.insertNode(k, tree.root);
-        outFile << INSERT << " " << k << endl;
-      }
-      else
-      {
-        cerr << "Insert Failed" << endl;
-      }
+      tree.insertNode(k, tree.root);
+      outFile << INSERT << " " << k << endl;
       break;
     case DELETE:
       if (!(iss >> k))

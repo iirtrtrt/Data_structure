@@ -9,5 +9,5 @@ run: most_similar_websites_skeleton
 
 clean: most_similar_websites_skeleton
 	rm most_similar_websites_skeleton
-	# rm output1.txt
-	# rm output2.txt
+	rm output1.txt
+	rm output2.txt

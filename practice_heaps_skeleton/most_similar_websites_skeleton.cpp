@@ -4,8 +4,6 @@
 #include <queue>
 #include <sstream>
 #include <utility>
-#include <unordered_map>
-#include <unordered_set>
 #include <queue>
 #include <map>
 
@@ -13,16 +11,17 @@ using namespace std;
 
 struct byValue
 {
-  constexpr bool operator()(
-      pair<string, int> const &a,
-      pair<string, int> const &b)
-      const noexcept
+  bool operator()(pair<string, int> const &a, pair<string, int> const &b)
   {
+    if (a.second == b.second)
+    {
+      return a.first > b.first;
+    }
     return a.second < b.second;
   }
 };
 
-void myFucntion(vector<pair<string, int>> v, int k)
+priority_queue<pair<string, int>, vector<pair<string, int>>, byValue> myFucntion(vector<pair<string, int>> v, int k)
 {
   map<string, int> m;
   priority_queue<pair<string, int>, vector<pair<string, int>>, byValue> pq;
@@ -49,14 +48,16 @@ void myFucntion(vector<pair<string, int>> v, int k)
     pq.push(make_pair(i->first, i->second));
   }
 
-  while (!pq.empty())
+  return pq;
+}
+
+void write(priority_queue<pair<string, int>, vector<pair<string, int>>, byValue> &pq, int k, ofstream &outFile)
+{
+  for (int i = 0; i < k; i++)
   {
-    cout << pq.top().first
-         << " " << pq.top().second
-         << endl;
+    outFile << pq.top().first << endl;
     pq.pop();
   }
-  cout << endl;
 }
 
 int main(int argc, char *argv[])
@@ -93,8 +94,8 @@ int main(int argc, char *argv[])
   }
   // TODO. Call your function with arguments "history" and "k",
   // and write the result into "outFile"
-  myFucntion(history, k);
-  // priority_queue<vector<pair<string, int>>, int, myFucntion> pq;
+  priority_queue<pair<string, int>, vector<pair<string, int>>, byValue> pq = myFucntion(history, k);
+  write(pq, k, outFile);
 
   outFile.close();
   inFile.close();

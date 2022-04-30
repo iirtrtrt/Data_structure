@@ -46,9 +46,9 @@ public:
   bool isEmpty() { return (root == nullptr); }
   TreeNode *findMin();
   TreeNode *findMax();
-  TreeNode *search(int);
+  TreeNode *search(int, TreeNode *);
   void insertNode(int, TreeNode *);
-  void deleteNode(int, TreeNode *);
+  void deleteNode(int);
   void writeInorder(ofstream &, TreeNode *);
   void writePreorder(ofstream &);
   void writePostorder(ofstream &);
@@ -141,9 +141,21 @@ TreeNode *BinarySearchTree::findMax()
 // Given a query, search for the node whose key is equal to query.
 // If the node exists, return the key
 // Otherwise, return nullptr
-TreeNode *BinarySearchTree::search(int query)
+TreeNode *BinarySearchTree::search(int query, TreeNode *ptr)
 {
   // Practice 5
+  if (ptr->key == query or ptr == nullptr)
+  {
+    return ptr;
+  }
+  else if (query < ptr->key and ptr->left)
+  {
+    return search(query, ptr->left);
+  }
+  else if (query > ptr->key and ptr->right)
+  {
+    return search(query, ptr->right);
+  }
   return 0;
 }
 
@@ -190,9 +202,71 @@ void BinarySearchTree::insertNode(int k, TreeNode *ptr)
 
 // If deletion fails, immediately terminate the program
 // Otherwise, delete the node with key k
-void BinarySearchTree::deleteNode(int k, TreeNode *ptr)
+void BinarySearchTree::deleteNode(int k)
 {
   // TODO. Practice 6
+  // if (root->key == k)
+  // {
+
+  //   TreeNode *bef = root->right;
+  //   TreeNode *cur = root->right;
+  //   while (cur->left)
+  //   {
+  //     bef = cur;
+  //     cur = cur->left;
+  //   }
+  //   cur->left = root->left;
+  //   cur->right = root->right;
+  //   bef->left = nullptr;
+  //   delete root;
+  //   root = cur;
+  //   return;
+  // }
+  TreeNode *ptr = root;
+  while (ptr)
+  {
+    if (ptr->key == k)
+    {
+      TreeNode *bef = ptr->right;
+      TreeNode *cur = ptr->right;
+      while (cur->left)
+      {
+        bef = cur;
+        cur = cur->left;
+      }
+      if (ptr->left)
+      {
+        cur->left = ptr->left;
+      }
+      if (ptr->right)
+      {
+        cur->right = ptr->right;
+      }
+      if (bef != ptr)
+      {
+        bef->left = nullptr;
+      }
+
+      if (ptr == root)
+      {
+        delete root;
+        root = cur;
+      }
+      else
+      {
+        delete ptr;
+      }
+      return;
+    }
+    else if (ptr->key < k and ptr->right)
+    {
+      ptr = ptr->right;
+    }
+    else if (ptr->key > k and ptr->left)
+    {
+      ptr = ptr->left;
+    }
+  }
 }
 
 // Given an output file stream, write the keys of all the nodes
@@ -378,6 +452,16 @@ int main(int argc, char *argv[])
         exit(1);
       }
       // TODO. Practice 6. Call the function for deletion
+      if (tree.search(k, tree.root))
+      {
+        tree.deleteNode(k);
+        outFile << DELETE << " " << k << endl;
+      }
+      else
+      {
+        exit(1);
+      }
+
       break;
     default:
       cerr << "Undefined operator" << endl;

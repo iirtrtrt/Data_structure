@@ -1,0 +1,9 @@
+1
+google.com 1
+google.com 3
+google.com 4
+wikipedia.org 5
+wikipedia.org 6
+naver.com 1
+naver.com 2
+naver.com 3

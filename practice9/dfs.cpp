@@ -5,8 +5,8 @@ using namespace std;
 // list representation
 class Graph
 {
-    int V;          // No. of vertices
-    list<int> *adj; // adjacency lists
+    int V;                 // No. of vertices
+    vector<list<int>> adj; // adjacency lists
 public:
     Graph(int V);               // Constructor
     void addEdge(int v, int w); // to add an edge to graph
@@ -17,7 +17,7 @@ public:
 Graph::Graph(int V)
 {
     this->V = V;
-    adj = new list<int>[V];
+    adj.resize(V);
 }
 
 void Graph::addEdge(int v, int w)

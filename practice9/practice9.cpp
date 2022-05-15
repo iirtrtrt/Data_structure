@@ -128,6 +128,7 @@ int main(int argc, char *argv[])
         exit(1);
       }
       g.setVertical(nVertices);
+
       cnt = nEdges;
       while (cnt)
       {

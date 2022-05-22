@@ -37,7 +37,7 @@ public:
     void routeOut(vector<int> &, int, ofstream &);
 };
 
-void Graph::setVertical(int nVertices)
+void Graph::setVertical(int nVertices) // Makes a vector iwth input size
 {
     this->nVertices = nVertices;
     adj.resize(nVertices, vector<pair<int, int>>(nVertices));
@@ -54,7 +54,7 @@ void Graph::addEdge(vector<tuple<int, int, int>> &data)
         tie(u, v, wgt) = *i;
         assert(u >= 0 && u < nVertices);
         assert(v >= 0 && v < nVertices);
-        adj[u].push_back(make_pair(v, wgt));
+        adj[u].push_back(make_pair(v, wgt)); // Stores 'u' for index, 'v' for pair.first, and 'wgt' for pair.second
     }
 }
 
@@ -62,27 +62,27 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
 {
     priority_queue<pair<int, int>, vector<pair<int, int>>, shortest> pq;
 
-    vector<int> dist(nVertices, 999999999); // Sets maximum distances
+    vector<int> dist(nVertices, 999999999); // Sets maximum distances, 999999999
 
     pq.push(make_pair(-1, s));
     dist[s] = 0; // The distance of the route is saved
 
-    vector<bool> visited; // Lists a visited points
-    visited.resize(nVertices, false);
-    visited[s] = true;
-    vector<int> route; // Lists the shortest route (the element is for going to its index)
+    vector<bool> visited;             // To list a visited points
+    visited.resize(nVertices, false); // Makes all elements false
+    visited[s] = true;                // Starting point is visited
+    vector<int> route;                // Lists the shortest route (the element is for going to its index)
     route.resize(nVertices, -1);
 
-    while (!pq.empty())
+    while (!pq.empty()) // Till this queue is empty checks the 'u'
     {
         int u = pq.top().second;
         pq.pop();
-        visited[u] = true;
+        visited[u] = true; // Make it true if the point, u, is visited
         for (int i = 0; i < adj[u].size(); i++)
         {
             int v = adj[u][i].first;
             int wgt = adj[u][i].second;
-            if (!visited[v] && dist[v] > dist[u] + wgt)
+            if (!visited[v] && dist[v] > dist[u] + wgt) // At unvisited place, changes the distance, if it found shorter distance
             {
                 route[v] = u;
                 dist[v] = dist[u] + wgt;
@@ -91,18 +91,17 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
         }
     }
 
-    // Prints the starting point and the rest routes by recursive function
-    outFile << s;
     routeOut(route, e, outFile);
 }
 
 void Graph::routeOut(vector<int> &route, int i, ofstream &outFile)
 {
-    if (route[i] == -1) //
+    if (route[i] == -1) // Prints the start point and stop this function
     {
+        outFile << i;
         return;
     }
-    routeOut(route, route[i], outFile);
+    routeOut(route, route[i], outFile); // Prints the index and go to the elements
     outFile << " " << i;
 }
 

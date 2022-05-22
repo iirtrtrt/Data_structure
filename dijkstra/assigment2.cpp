@@ -4,7 +4,6 @@
 #include <sstream>
 #include <utility>
 #include <map>
-#include <list>
 #include <cassert>
 #include <vector>
 

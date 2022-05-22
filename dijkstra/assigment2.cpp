@@ -13,7 +13,7 @@ using namespace std;
 const char CONSTRUCT = 'C';
 const char DIJKSTRA = 'S';
 
-struct shortest
+struct shortest // To sort the priority queue (greater)
 {
     bool operator()(pair<int, int> const &a, pair<int, int> const &b)
     {
@@ -34,7 +34,7 @@ public:
     void setVertical(int);
     void addEdge(vector<tuple<int, int, int>> &);
     void dijkstra(int, int, ofstream &);
-    void route(int[], int, ofstream &);
+    void routeOut(vector<int> &, int, ofstream &);
 };
 
 void Graph::setVertical(int nVertices)
@@ -62,15 +62,16 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
 {
     priority_queue<pair<int, int>, vector<pair<int, int>>, shortest> pq;
 
-    vector<int> dist(nVertices, 999999999);
+    vector<int> dist(nVertices, 999999999); // Sets maximum distances
 
     pq.push(make_pair(-1, s));
-    dist[s] = 0;
+    dist[s] = 0; // The distance of the route is saved
 
-    vector<bool> visited;
+    vector<bool> visited; // Lists a visited points
     visited.resize(nVertices, false);
     visited[s] = true;
-    int parent[nVertices] = {-1};
+    vector<int> route; // Lists the shortest route (the element is for going to its index)
+    route.resize(nVertices, -1);
 
     while (!pq.empty())
     {
@@ -80,27 +81,28 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
         for (int i = 0; i < adj[u].size(); i++)
         {
             int v = adj[u][i].first;
-            int wei = adj[u][i].second;
-            if (!visited[v] && dist[v] > dist[u] + wei)
+            int wgt = adj[u][i].second;
+            if (!visited[v] && dist[v] > dist[u] + wgt)
             {
-                parent[v] = u;
-                dist[v] = dist[u] + wei;
+                route[v] = u;
+                dist[v] = dist[u] + wgt;
                 pq.push(make_pair(dist[v], v));
             }
         }
     }
 
+    // Prints the starting point and the rest routes by recursive function
     outFile << s;
-    route(parent, e, outFile);
+    routeOut(route, e, outFile);
 }
 
-void Graph::route(int parent[], int i, ofstream &outFile)
+void Graph::routeOut(vector<int> &route, int i, ofstream &outFile)
 {
-    if (parent[i] == -1)
+    if (route[i] == -1) //
     {
         return;
     }
-    route(parent, parent[i], outFile);
+    routeOut(route, route[i], outFile);
     outFile << " " << i;
 }
 

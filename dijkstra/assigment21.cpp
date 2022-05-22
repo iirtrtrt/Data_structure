@@ -29,20 +29,23 @@ struct shortest
 class Graph
 {
     int nVertices;
-    vector<vector<pair<int, int>>> adj;
+    // vector<vector<pair<int, int>>> adj;
+    vector<vector<int>> adj;
 
 public:
     void setVertical(int);
     void addEdge(vector<tuple<int, int, int>> &);
     void dijkstra(int, int, ofstream &);
+    int minDistance(int[], bool[]);
     void printPath(int[], int);
-    void printSolution(vector<int> &, int, int[], int);
+    void printSolution(int[], int, int[]);
 };
 
 void Graph::setVertical(int nVertices)
 {
     this->nVertices = nVertices;
-    adj.resize(nVertices, vector<pair<int, int>>(nVertices));
+    // adj.resize(nVertices, vector<pair<int, int>>(nVertices));
+    adj.resize(nVertices, vector<int>(nVertices, 0));
 }
 
 void Graph::addEdge(vector<tuple<int, int, int>> &data)
@@ -56,59 +59,78 @@ void Graph::addEdge(vector<tuple<int, int, int>> &data)
         tie(u, v, wgt) = *i;
         assert(u >= 0 && u < nVertices);
         assert(v >= 0 && v < nVertices);
-        adj[u].push_back(make_pair(v, wgt));
+        adj[u][v] = wgt;
     }
 }
+
+int Graph::minDistance(int dist[], bool sptSet[])
+{
+    // Initialize min value
+    int min = 99999999, min_index;
+    for (int i = 0; i < nVertices; i++)
+        if (sptSet[i] == false && dist[i] <= min)
+            min = dist[i], min_index = i;
+    return min_index;
+}
+
+// Function to print shortest path from source to j using
+// parent array
 void Graph::printPath(int parent[], int j)
 {
+    // Base Case : If j is source
     if (parent[j] == -1)
-    {
         return;
-    }
     printPath(parent, parent[j]);
-    cout << " " << j;
+    cout << j << " ";
 }
 
-void Graph::printSolution(vector<int> &dist, int n, int parent[], int e)
+// A utility function to print the constructed distance
+// array
+void Graph::printSolution(int dist[], int n, int parent[])
 {
     int src = 0;
-
-    cout << src;
-    printPath(parent, e);
+    cout << "Vertex\t Distance\tPath";
+    for (int i = 1; i < nVertices; i++)
+    {
+        printf("\n%d -> %d \t\t %d\t\t%d ", src, i, dist[i],
+               src);
+        printPath(parent, i);
+    }
 }
 
 void Graph::dijkstra(int s, int e, ofstream &outFile)
 {
-    priority_queue<pair<int, int>, vector<pair<int, int>>, shortest> pq;
+    int dist[nVertices];
 
-    vector<int> dist(nVertices, 999999999);
+    // sptSet[i] will true if vertex i is included / in
+    // shortest path tree or shortest distance from src to i
+    // is finalized
+    bool sptSet[nVertices] = {false};
 
-    pq.push(make_pair(0, s));
-    dist[s] = 0;
-
-    vector<bool> visited;
-    visited.resize(nVertices, false);
-    visited[s] = true;
+    // Parent array to store shortest path tree
     int parent[nVertices] = {-1};
 
-    while (!pq.empty())
+    // Initialize all distances as INFINITE
+    for (int i = 0; i < nVertices; i++)
+        dist[i] = 99999999;
+
+    // Distance of source vertex from itself is always 0
+    dist[s] = 0;
+
+    // Find shortest path for all vertices
+    for (int count = 0; count < nVertices - 1; count++)
     {
-        int u = pq.top().second;
-        pq.pop();
-        visited[u] = true;
-        for (int i = 0; i < adj[u].size(); i++)
-        {
-            int v = adj[u][i].first;
-            int wei = adj[u][i].second;
-            if (!visited[v] && dist[v] > dist[u] + wei)
+        int u = minDistance(dist, sptSet);
+        cout << u << endl;
+        sptSet[u] = true;
+        for (int v = 0; v < nVertices; v++)
+            if (!sptSet[v] && adj[u][v] && dist[u] + adj[u][v] < dist[v])
             {
                 parent[v] = u;
-                dist[v] = dist[u] + wei;
-                pq.push(make_pair(dist[v], v));
+                dist[v] = dist[u] + adj[u][v];
             }
-        }
     }
-    printSolution(dist, nVertices, parent, e);
+    printSolution(dist, nVertices, parent);
 }
 
 int main(int argc, char *argv[])

@@ -15,7 +15,7 @@ const char DIJKSTRA = 'S';
 
 struct shortest
 {
-    bool operator()(pair<string, int> const &a, pair<string, int> const &b)
+    bool operator()(pair<int, int> const &a, pair<int, int> const &b)
     {
         if (a.second == b.second)
         {
@@ -28,20 +28,18 @@ struct shortest
 class Graph
 {
     int nVertices;
-    vector<vector<int>> adj;
+    vector<vector<pair<int, int>>> adj;
 
 public:
     void setVertical(int);
     void addEdge(vector<tuple<int, int, int>> &);
-    void dijkstra(int, int);
-    int minDistance(int[], bool[]);
-    void printSolution(int[], int);
+    void dijkstra(int, int, ofstream &);
 };
 
 void Graph::setVertical(int nVertices)
 {
     this->nVertices = nVertices;
-    adj.resize(nVertices, vector<int>(nVertices, 0));
+    adj.resize(nVertices, vector<pair<int, int>>(nVertices));
 }
 
 void Graph::addEdge(vector<tuple<int, int, int>> &data)
@@ -55,66 +53,49 @@ void Graph::addEdge(vector<tuple<int, int, int>> &data)
         tie(u, v, wgt) = *i;
         assert(u >= 0 && u < nVertices);
         assert(v >= 0 && v < nVertices);
-        adj[u][v] = wgt;
+        adj[u].push_back(make_pair(v, wgt));
     }
 }
 
-int Graph::minDistance(int dist[], bool sptSet[])
+void Graph::dijkstra(int s, int e, ofstream &outFile)
 {
-    int min = 999999999;
-    int min_index;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, shortest> pq;
 
-    for (int v = 0; v < nVertices; v++)
-        if (sptSet[v] == false && dist[v] <= min)
-            min = dist[v], min_index = v;
+    vector<int> dist(nVertices, 999999999);
 
-    return min_index;
-}
-
-void Graph::printSolution(int dist[], int n)
-{
-    printf("Vertex   Distance from Source\n");
-    for (int i = 0; i < nVertices; i++)
-        printf("%d \t\t %d\n", i, dist[i]);
-}
-
-void Graph::dijkstra(int s, int e)
-{
-    priority_queue<pair<string, int>, vector<pair<string, int>>, shortest> pq;
-
-    int dist[nVertices]; // The output array.  dist[i] will hold the shortest
-    // distance from src to i
-
-    bool sptSet[nVertices]; // sptSet[i] will be true if vertex i is included in shortest
-    // path tree or shortest distance from src to i is finalized
-
-    // Initialize all distances as INFINITE and stpSet[] as false
-    for (int i = 0; i < nVertices; i++)
-        dist[i] = 999999999, sptSet[i] = false;
-
-    // Distance of source vertex from itself is always 0
+    pq.push(make_pair(0, s));
     dist[s] = 0;
 
-    // Find shortest path for all vertices
-    for (int count = 0; count < nVertices - 1; count++)
+    vector<bool> visited;
+    visited.resize(nVertices, false);
+    string path = to_string(s);
+    visited[s] = true;
+
+    while (!pq.empty())
     {
-        // Pick the minimum distance vertex from the set of vertices not
-        // yet processed. u is always equal to src in the first iteration.
-        int u = minDistance(dist, sptSet);
-        cout << "What is u : " << u << endl;
-        // Mark the picked vertex as processed
-        sptSet[u] = true;
+        int u = pq.top().second;
+        pq.pop();
 
-        // Update dist value of the adjacent vertices of the picked vertex.
-        for (int v = 0; v < nVertices; v++)
+        for (int i = 0; i < adj[u].size(); i++)
+        {
+            int v = adj[u][i].first;
+            int wei = adj[u][i].second;
 
-            // Update dist[v] only if is not in sptSet, there is an edge from
-            // u to v, and total weight of path from src to  v through u is
-            // smaller than current value of dist[v]
-            if (!sptSet[v] && adj[u][v] && dist[u] != 999999999 && dist[u] + adj[u][v] < dist[v])
-                dist[v] = dist[u] + adj[u][v];
+            if (dist[v] > dist[u] + wei && v <= e)
+            {
+                if (!visited[u])
+                {
+                    visited[u] = true;
+                    path = path + " " + to_string(u);
+                }
+                dist[v] = dist[u] + wei;
+                pq.push(make_pair(dist[v], v));
+            }
+        }
     }
-    printSolution(dist, nVertices);
+    path = path + " " + to_string(e);
+
+    outFile << path << endl;
 }
 
 int main(int argc, char *argv[])
@@ -170,7 +151,7 @@ int main(int argc, char *argv[])
                 cerr << "DIJKSTRA: invalid input" << endl;
                 exit(1);
             }
-            g.dijkstra(s, e);
+            g.dijkstra(s, e, outFile);
             break;
         default:
             cerr << "Undefined operator" << endl;

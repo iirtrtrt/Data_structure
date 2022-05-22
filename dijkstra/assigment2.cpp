@@ -35,7 +35,6 @@ public:
     void addEdge(vector<tuple<int, int, int>> &);
     void dijkstra(int, int, ofstream &);
     void route(int[], int, ofstream &);
-    void write(vector<int> &, int, int[], int, int, ofstream &);
 };
 
 void Graph::setVertical(int nVertices)
@@ -91,7 +90,8 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
         }
     }
 
-    write(dist, nVertices, parent, s, e, outFile);
+    outFile << s;
+    route(parent, e, outFile);
 }
 
 void Graph::route(int parent[], int i, ofstream &outFile)
@@ -102,12 +102,6 @@ void Graph::route(int parent[], int i, ofstream &outFile)
     }
     route(parent, parent[i], outFile);
     outFile << " " << i;
-}
-
-void Graph::write(vector<int> &dist, int n, int parent[], int s, int e, ofstream &outFile)
-{
-    outFile << s;
-    route(parent, e, outFile);
 }
 
 int main(int argc, char *argv[])

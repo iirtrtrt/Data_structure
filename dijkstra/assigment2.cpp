@@ -7,7 +7,6 @@
 #include <list>
 #include <cassert>
 #include <vector>
-#include <stack>
 
 using namespace std;
 
@@ -35,8 +34,8 @@ public:
     void setVertical(int);
     void addEdge(vector<tuple<int, int, int>> &);
     void dijkstra(int, int, ofstream &);
-    void printPath(int[], int);
-    void printSolution(vector<int> &, int, int[], int);
+    void route(int[], int, ofstream &);
+    void write(vector<int> &, int, int[], int, int, ofstream &);
 };
 
 void Graph::setVertical(int nVertices)
@@ -59,23 +58,6 @@ void Graph::addEdge(vector<tuple<int, int, int>> &data)
         adj[u].push_back(make_pair(v, wgt));
     }
 }
-void Graph::printPath(int parent[], int j)
-{
-    if (parent[j] == -1)
-    {
-        return;
-    }
-    printPath(parent, parent[j]);
-    cout << " " << j;
-}
-
-void Graph::printSolution(vector<int> &dist, int n, int parent[], int e)
-{
-    int src = 0;
-
-    cout << src;
-    printPath(parent, e);
-}
 
 void Graph::dijkstra(int s, int e, ofstream &outFile)
 {
@@ -83,7 +65,7 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
 
     vector<int> dist(nVertices, 999999999);
 
-    pq.push(make_pair(0, s));
+    pq.push(make_pair(-1, s));
     dist[s] = 0;
 
     vector<bool> visited;
@@ -108,7 +90,24 @@ void Graph::dijkstra(int s, int e, ofstream &outFile)
             }
         }
     }
-    printSolution(dist, nVertices, parent, e);
+
+    write(dist, nVertices, parent, s, e, outFile);
+}
+
+void Graph::route(int parent[], int i, ofstream &outFile)
+{
+    if (parent[i] == -1)
+    {
+        return;
+    }
+    route(parent, parent[i], outFile);
+    outFile << " " << i;
+}
+
+void Graph::write(vector<int> &dist, int n, int parent[], int s, int e, ofstream &outFile)
+{
+    outFile << s;
+    route(parent, e, outFile);
 }
 
 int main(int argc, char *argv[])

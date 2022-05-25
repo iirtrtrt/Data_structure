@@ -8,100 +8,119 @@ using namespace std;
 const char MERGE = 'M';
 const char QUICK = 'Q';
 
-void merge(vector<int> &v, int s, int m, int e)
+void getNumbers(ifstream &inFile, string &splited, string &line, vector<int> &vec)
+{
+  if (getline(inFile, line))
+  {
+    istringstream eiss(line);
+    while (getline(eiss, splited, ' '))
+    {
+      vec.push_back(stoi(splited));
+    }
+  }
+}
+
+void write(ofstream &outFile, int s, vector<int> &vec)
+{
+  for (int i = 0; i < s; i++)
+  {
+    outFile << vec[i] << " ";
+  }
+  outFile << endl;
+}
+
+void merge(vector<int> &vec, int sta, int mid, int end)
 {
   vector<int> temp;
+  int i = sta;
+  int j = mid + 1;
 
-  int i, j;
-  i = s;
-  j = m + 1;
-
-  while (i <= m && j <= e)
+  while (i <= mid && j <= end)
   {
 
-    if (v[i] <= v[j])
+    if (vec[i] <= vec[j])
     {
-      temp.push_back(v[i]);
-      ++i;
+      temp.push_back(vec[i]);
+      i++;
     }
     else
     {
-      temp.push_back(v[j]);
-      ++j;
+      temp.push_back(vec[j]);
+      j++;
     }
   }
 
-  while (i <= m)
+  while (i <= mid)
   {
-    temp.push_back(v[i]);
-    ++i;
+    temp.push_back(vec[i]);
+    i++;
   }
 
-  while (j <= e)
+  while (j <= end)
   {
-    temp.push_back(v[j]);
-    ++j;
+    temp.push_back(vec[j]);
+    j++;
   }
 
-  for (int i = s; i <= e; ++i)
-    v[i] = temp[i - s];
+  for (int i = sta; i <= end; i++)
+    vec[i] = temp[i - sta];
 }
 
-void mergeSort(vector<int> &v, int s, int e)
+void mergeSort(vector<int> &vec, int sta, int end)
 {
-  if (s < e)
+  if (sta < end)
   {
-    int m = (s + e) / 2;
-    mergeSort(v, s, m);
-    mergeSort(v, m + 1, e);
-    merge(v, s, m, e);
+    int mid = (sta + end) / 2;
+    mergeSort(vec, sta, mid);
+    mergeSort(vec, mid + 1, end);
+    merge(vec, sta, mid, end);
   }
 }
 
-int paritition(vector<int> &v, int left, int right)
+int paritition(vector<int> &vec, int left, int right)
 {
 
-  int pivot = v[left];
+  int pivot = vec[left];
   int low = left + 1;
   int high = right;
 
   while (low <= high)
   {
-    while (low <= right && pivot >= v[low])
+    while (low <= right && pivot >= vec[low])
     {
       low++;
     }
-    while (high >= (left + 1) && pivot <= v[high])
+    while (high >= (left + 1) && pivot <= vec[high])
     {
       high--;
     }
     if (low <= high)
     {
 
-      int temp = v[low];
-      v[low] = v[high];
-      v[high] = temp;
+      int temp = vec[low];
+      vec[low] = vec[high];
+      vec[high] = temp;
     }
   }
 
-  int temp = v[left];
-  v[left] = v[high];
-  v[high] = temp;
+  int temp = vec[left];
+  vec[left] = vec[high];
+  vec[high] = temp;
 
   return high;
 }
 
-void quickSort(vector<int> &v, int left, int right)
+void quickSort(vector<int> &vec, int left, int right)
 {
   if (left < right)
   {
-    int q = paritition(v, left, right);
-    quickSort(v, left, q - 1);
-    quickSort(v, q + 1, right);
+    int par = paritition(vec, left, right);
+    quickSort(vec, left, par - 1);
+    quickSort(vec, par + 1, right);
   }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argvec[])
 {
   if (argc != 3)
   {
@@ -109,15 +128,16 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  ifstream inFile(argv[1]);
-  ofstream outFile(argv[2]);
+  ifstream inFile(argvec[1]);
+  ofstream outFile(argvec[2]);
   string line;
-  string stringBuffer;
+  string splited;
+
   while (getline(inFile, line))
   {
     char op = line[0];
     istringstream iss(line.substr(1));
-    int s, cnt, val;
+    int s;
     vector<int> vec;
 
     switch (op)
@@ -129,21 +149,10 @@ int main(int argc, char *argv[])
         exit(1);
       }
 
-      if (getline(inFile, line))
-      {
-        istringstream eiss(line);
-        while (getline(eiss, stringBuffer, ' '))
-        {
-          vec.push_back(stoi(stringBuffer));
-        }
-      }
-
+      getNumbers(inFile, splited, line, vec);
       mergeSort(vec, 0, s - 1);
-      for (int i = 0; i < s; i++)
-      {
-        outFile << vec[i] << " ";
-      }
-      outFile << endl;
+      write(outFile, s, vec);
+
       break;
     case QUICK:
       if (!(iss >> s))
@@ -151,21 +160,11 @@ int main(int argc, char *argv[])
         cerr << "QUICK: invalid input" << endl;
         exit(1);
       }
-      if (getline(inFile, line))
-      {
-        istringstream eiss(line);
-        while (getline(eiss, stringBuffer, ' '))
-        {
-          vec.push_back(stoi(stringBuffer));
-        }
-      }
 
+      getNumbers(inFile, splited, line, vec);
       quickSort(vec, 0, s - 1);
-      for (int i = 0; i < s; i++)
-      {
-        outFile << vec[i] << " ";
-      }
-      outFile << endl;
+      write(outFile, s, vec);
+
       break;
     default:
       cerr << "Undefined operator" << endl;

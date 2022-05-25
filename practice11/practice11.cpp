@@ -63,7 +63,9 @@ void merge(vector<int> &vec, int sta, int mid, int end)
   }
 
   for (int i = sta; i <= end; i++)
+  {
     vec[i] = temp[i - sta];
+  }
 }
 
 void mergeSort(vector<int> &vec, int sta, int end)
@@ -96,7 +98,6 @@ int paritition(vector<int> &vec, int left, int right)
     }
     if (low <= high)
     {
-
       int temp = vec[low];
       vec[low] = vec[high];
       vec[high] = temp;

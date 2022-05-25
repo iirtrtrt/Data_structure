@@ -84,8 +84,6 @@ void mergeSort(vector<int> &vec, int sta, int end)
 
 int paritition(vector<int> &vec, int sta, int end)
 {
-
-  // int vec[sta] = vec[sta];
   int i = sta + 1;
   int j = end;
   int temp;

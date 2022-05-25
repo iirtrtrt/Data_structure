@@ -1,12 +1,15 @@
-#include <iostream>
+// Practice 11. Sorting
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <vector>
 
 using namespace std;
 
-const char MERGE = 'M';
-const char QUICK = 'Q';
+const char MERGE_SORT = 'M';
+const char QUICK_SORT = 'Q';
 
 void getNumbers(ifstream &inFile, string &splited, string &line, vector<int> &vec)
 {
@@ -38,7 +41,7 @@ void merge(vector<int> &vec, int sta, int mid, int end)
   while (i <= mid && j <= end)
   {
 
-    if (vec[i] <= vec[j])
+    if (vec[i] >= vec[j])
     {
       temp.push_back(vec[i]);
       i++;
@@ -79,45 +82,48 @@ void mergeSort(vector<int> &vec, int sta, int end)
   }
 }
 
-int paritition(vector<int> &vec, int left, int right)
+int paritition(vector<int> &vec, int sta, int end)
 {
 
-  int pivot = vec[left];
-  int low = left + 1;
-  int high = right;
+  // int vec[sta] = vec[sta];
+  int i = sta + 1;
+  int j = end;
+  int temp;
 
-  while (low <= high)
+  while (i <= j)
   {
-    while (low <= right && pivot >= vec[low])
+    while (i <= end && vec[sta] <= vec[i])
     {
-      low++;
+      i++;
     }
-    while (high >= (left + 1) && pivot <= vec[high])
+    while (j > sta && vec[sta] >= vec[j])
     {
-      high--;
+      j--;
     }
-    if (low <= high)
+    if (i > j)
     {
-      int temp = vec[low];
-      vec[low] = vec[high];
-      vec[high] = temp;
+      temp = vec[j];
+      vec[j] = vec[sta];
+      vec[sta] = temp;
+    }
+    else
+    {
+      temp = vec[j];
+      vec[j] = vec[i];
+      vec[i] = temp;
     }
   }
 
-  int temp = vec[left];
-  vec[left] = vec[high];
-  vec[high] = temp;
-
-  return high;
+  return j;
 }
 
-void quickSort(vector<int> &vec, int left, int right)
+void quickSort(vector<int> &vec, int sta, int end)
 {
-  if (left < right)
+  if (sta < end)
   {
-    int par = paritition(vec, left, right);
-    quickSort(vec, left, par - 1);
-    quickSort(vec, par + 1, right);
+    int par = paritition(vec, sta, end);
+    quickSort(vec, sta, par - 1);
+    quickSort(vec, par + 1, end);
   }
 }
 
@@ -143,10 +149,10 @@ int main(int argc, char *argvec[])
 
     switch (op)
     {
-    case MERGE:
+    case MERGE_SORT:
       if (!(iss >> s))
       {
-        cerr << "MERGE: invalid input" << endl;
+        cerr << "MERGE_SORT: invalid input" << endl;
         exit(1);
       }
 
@@ -155,10 +161,10 @@ int main(int argc, char *argvec[])
       write(outFile, s, vec);
 
       break;
-    case QUICK:
+    case QUICK_SORT:
       if (!(iss >> s))
       {
-        cerr << "QUICK: invalid input" << endl;
+        cerr << "QUICK_SORT: invalid input" << endl;
         exit(1);
       }
 

@@ -1,4 +1,3 @@
-// Practice 12. Use hash tables
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -56,49 +55,86 @@ int getPivot(vector<int> &vec, int low, int high)
   {
     return low;
   }
+
+  int mid = (low + high) / 2;
+
+  if (mid < high && vec[mid] > vec[mid + 1])
+  {
+    return mid;
+  }
+  else if (mid > low && vec[mid] < vec[mid - 1])
+  {
+    return mid - 1;
+  }
+  else if (vec[mid] <= vec[low])
+  {
+    return getPivot(vec, low, mid - 1);
+  }
   else
   {
-    int mid = (low + high) / 2;
-
-    if (mid < high && vec[mid] > vec[mid + 1])
-    {
-      return mid;
-    }
-
-    if (mid > low && vec[mid] < vec[mid - 1])
-    {
-      return mid - 1;
-    }
-
-    if (vec[low] >= vec[mid])
-    {
-      return getPivot(vec, low, mid - 1);
-    }
-
     return getPivot(vec, mid + 1, high);
   }
 }
 
-int rotatedBinarySearch(vector<int> &vec, int x)
+int rotatedBinarySearch(vector<int> &vec, int x, int low, int high)
 {
-  int pivot = getPivot(vec, 0, vec.size() - 1);
+  int pivot = getPivot(vec, low, high);
 
   if (pivot == -1)
   {
-    return BinarySearchRec(vec, x, 0, vec.size() - 1);
+    return BinarySearchRec(vec, x, low, high);
   }
-
-  if (vec[pivot] == x)
+  else if (vec[pivot] == x)
   {
     return pivot;
   }
-
-  if (vec[0] <= x)
+  else if (vec[low] <= x)
   {
-    return BinarySearchRec(vec, x, 0, pivot - 1);
+    return BinarySearchRec(vec, x, low, pivot - 1);
+  }
+  else
+  {
+    return BinarySearchRec(vec, x, pivot + 1, high);
+  }
+}
+
+int dublicated(vector<int> &vec, int x, int low, int high)
+{
+  if (low > high)
+  {
+    return -1;
+  }
+  else if (low == high)
+  {
+    return low;
   }
 
-  return BinarySearchRec(vec, x, pivot + 1, vec.size() - 1);
+  int mid = (low + high) / 2;
+
+  if (vec[mid] == x)
+  {
+    return mid;
+  }
+  else if (vec[mid] == vec[low])
+  {
+    while (vec[mid] == vec[low])
+    {
+      low++;
+    }
+    return dublicated(vec, x, low, high);
+  }
+  else if (vec[mid] == vec[high])
+  {
+    while (vec[mid] == vec[high])
+    {
+      high--;
+    }
+    return dublicated(vec, x, low, high);
+  }
+  else
+  {
+    return rotatedBinarySearch(vec, x, low, high);
+  }
 }
 
 int main(int argc, char *argv[])
@@ -126,8 +162,15 @@ int main(int argc, char *argv[])
         cerr << "BINARY_SEARCH: invalid input" << endl;
         exit(1);
       }
-      getNumbers(inFile, splited, line, vec);
-      outFile << BinarySearchRec(vec, x, 0, n - 1) << endl;
+      if (n != 0)
+      {
+        getNumbers(inFile, splited, line, vec);
+        outFile << BinarySearchRec(vec, x, 0, n - 1) << endl;
+      }
+      else
+      {
+        outFile << -1 << endl;
+      }
 
       break;
     case ROTATED_ARRAY:
@@ -136,8 +179,15 @@ int main(int argc, char *argv[])
         cerr << "ROTATED_ARRAY: invalid input" << endl;
         exit(1);
       }
-      getNumbers(inFile, splited, line, vec);
-      cout << rotatedBinarySearch(vec, x) << endl;
+      if (n != 0)
+      {
+        getNumbers(inFile, splited, line, vec);
+        outFile << rotatedBinarySearch(vec, x, 0, n - 1) << endl;
+      }
+      else
+      {
+        outFile << -1 << endl;
+      }
 
       break;
     case DUPLICATES:
@@ -146,8 +196,15 @@ int main(int argc, char *argv[])
         cerr << "DUPLICATES: invalid input" << endl;
         exit(1);
       }
-      getNumbers(inFile, splited, line, vec);
-      // cout << BinarySearchRec(vec, x, 0, n - 1);
+      if (n != 0)
+      {
+        getNumbers(inFile, splited, line, vec);
+        outFile << dublicated(vec, x, 0, n - 1) << endl;
+      }
+      else
+      {
+        outFile << -1 << endl;
+      }
 
       break;
     default:
